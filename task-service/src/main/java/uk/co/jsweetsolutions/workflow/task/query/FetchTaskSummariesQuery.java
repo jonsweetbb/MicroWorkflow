@@ -1,4 +1,4 @@
-package uk.co.jsweetsolutions.workflow.tasks.query;
+package uk.co.jsweetsolutions.workflow.task.query;
 
 import lombok.Data;
 

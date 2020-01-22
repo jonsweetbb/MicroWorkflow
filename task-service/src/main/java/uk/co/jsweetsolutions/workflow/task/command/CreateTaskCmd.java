@@ -1,13 +1,10 @@
-package uk.co.jsweetsolutions.workflow.tasks.command;
+package uk.co.jsweetsolutions.workflow.task.command;
 
 import java.time.LocalDateTime;
-
-import javax.validation.constraints.NotNull;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import lombok.Data;
-import uk.co.jsweetsolutions.workflow.tasks.domain.TaskState;
 
 @Data
 public class CreateTaskCmd {

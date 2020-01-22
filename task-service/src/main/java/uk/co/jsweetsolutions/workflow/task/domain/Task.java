@@ -1,4 +1,4 @@
-package uk.co.jsweetsolutions.workflow.tasks.domain;
+package uk.co.jsweetsolutions.workflow.task.domain;
 
 import java.time.LocalDateTime;
 
@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 
 import lombok.Data;
-import uk.co.jsweetsolutions.workflow.tasks.command.CreateTaskCmd;
-import uk.co.jsweetsolutions.workflow.tasks.events.CreateTaskEvent;
+import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
+import uk.co.jsweetsolutions.workflow.task.event.CreateTaskEvent;
 
 // TODO separate out as POJO and use inheritance for Aggregate, Command
 @Aggregate

@@ -1,4 +1,4 @@
-package uk.co.jsweetsolutions.workflow.tasks.query;
+package uk.co.jsweetsolutions.workflow.task.query;
 
 import java.time.LocalDateTime;
 
@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import lombok.Data;
-import uk.co.jsweetsolutions.workflow.tasks.domain.TaskState;
 
 @Data
 @Entity

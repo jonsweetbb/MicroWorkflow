@@ -3,6 +3,7 @@ package uk.co.jsweetsolutions.workflow.gateway.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -14,11 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.co.jsweetsolutions.workflow.tasks.command.CreateTaskCmd;
-import uk.co.jsweetsolutions.workflow.tasks.domain.Task;
-import uk.co.jsweetsolutions.workflow.tasks.domain.TaskState;
-import uk.co.jsweetsolutions.workflow.tasks.query.FetchTaskSummariesQuery;
-import uk.co.jsweetsolutions.workflow.tasks.query.TaskSummary;
+import io.netty.util.concurrent.CompleteFuture;
+import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
+import uk.co.jsweetsolutions.workflow.task.domain.Task;
+import uk.co.jsweetsolutions.workflow.task.domain.TaskState;
+import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummariesQuery;
+import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummaryByIdQuery;
+import uk.co.jsweetsolutions.workflow.task.query.TaskSummary;
 
 @RestController
 public class TaskService {
@@ -30,7 +33,7 @@ public class TaskService {
 	private QueryGateway queryGateway;
 	
 	@PostMapping(path = "/task", produces = "application/json")
-	public TaskSummary createTask() {
+	public CompletableFuture<TaskSummary> createTask() {
 		CreateTaskCmd cmd = new CreateTaskCmd(UUID.randomUUID().toString(), LocalDateTime.now());
 		String result = commandGateway.sendAndWait(cmd, 10000, TimeUnit.MILLISECONDS);
 		//TODO throw exception if null
@@ -44,8 +47,7 @@ public class TaskService {
 	}
 	
 	@GetMapping(path = "/task/{id}")
-	public TaskSummary findTaskById(@PathVariable(name = "id") String id) {
-		
-		return null;
+	public CompletableFuture<TaskSummary> findTaskById(@PathVariable(name = "id") String id) {
+		return queryGateway.query(new FetchTaskSummaryByIdQuery(id), ResponseTypes.instanceOf(TaskSummary.class));
 	}
 }

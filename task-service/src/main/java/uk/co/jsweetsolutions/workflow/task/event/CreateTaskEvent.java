@@ -1,4 +1,4 @@
-package uk.co.jsweetsolutions.workflow.tasks.events;
+package uk.co.jsweetsolutions.workflow.task.event;
 
 import java.time.LocalDateTime;
 

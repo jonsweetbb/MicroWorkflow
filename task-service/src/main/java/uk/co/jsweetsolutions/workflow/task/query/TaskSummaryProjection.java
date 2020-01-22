@@ -1,4 +1,4 @@
-package uk.co.jsweetsolutions.workflow.tasks.query;
+package uk.co.jsweetsolutions.workflow.task.query;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,8 +8,11 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import uk.co.jsweetsolutions.workflow.tasks.domain.TaskState;
-import uk.co.jsweetsolutions.workflow.tasks.events.CreateTaskEvent;
+import uk.co.jsweetsolutions.workflow.task.event.CreateTaskEvent;
+import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummaryByIdQuery;
+import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummariesQuery;
+import uk.co.jsweetsolutions.workflow.task.query.TaskState;
+import uk.co.jsweetsolutions.workflow.task.query.TaskSummary;
 
 @Component
 public class TaskSummaryProjection {
@@ -29,7 +32,7 @@ public class TaskSummaryProjection {
 	}
 	
 	@QueryHandler
-	public Optional<TaskSummary> handle(FecthTaskSummaryByIdQuery query) {
+	public Optional<TaskSummary> handle(FetchTaskSummaryByIdQuery query) {
 		return wfTaskRepository.findById(query.getId());
 	}
 }
