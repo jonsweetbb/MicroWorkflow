@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -17,7 +18,7 @@ public class AssignmentGroupSummary {
 	private String id;
 	private String groupName;
 	
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<UserSummary> members;
 
 	public AssignmentGroupSummary(String groupId, String groupName, List<UserSummary> members) {

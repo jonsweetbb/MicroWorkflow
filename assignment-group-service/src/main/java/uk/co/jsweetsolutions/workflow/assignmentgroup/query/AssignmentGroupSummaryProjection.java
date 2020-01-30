@@ -24,7 +24,7 @@ public class AssignmentGroupSummaryProjection {
 	
 	@EventHandler
 	public void on(GroupCreatedEvt evt) {
-		AssignmentGroupSummary entity = new AssignmentGroupSummary(evt.getGroupId(), evt.getName(), null);
+		AssignmentGroupSummary entity = new AssignmentGroupSummary(evt.getGroupId(), evt.getName(), new ArrayList<>());
 		assignmentGroupRepository.save(entity);
 	}
 	
@@ -56,5 +56,9 @@ public class AssignmentGroupSummaryProjection {
 	@QueryHandler
 	public Optional<AssignmentGroupSummary> handle(AssignmentGroupByIdQuery qry){
 		return assignmentGroupRepository.findById(qry.getGroupId());
+	}
+	
+	public Optional<AssignmentGroupSummary> handle(AssignmentGroupByNameQuery qry){
+		return assignmentGroupRepository.findByGroupName(qry.getGroupName());
 	}
 }

@@ -9,11 +9,14 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.co.jsweetsolutions.workflow.assignmentgroup.command.AddMembersCmd;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.command.CreateGroupCmd;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.event.GroupCreatedEvt;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.event.MemberAddedEvt;
+import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupByNameQuery;
+import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummaryProjection;
 
 @Aggregate
 public class AssignmentGroup {
@@ -25,10 +28,16 @@ public class AssignmentGroup {
 	private List<String> members;
 	
 	@CommandHandler
-	public AssignmentGroup(CreateGroupCmd cmd) {
+	public AssignmentGroup(CreateGroupCmd cmd, AssignmentGroupSummaryProjection assignmentGroupProjection) {
 		if(!cmd.getName().matches("\\w{3,50}")) {
 			throw new IllegalArgumentException("Name " + cmd.getName() + "is not valid");
 		}
+		AssignmentGroupByNameQuery nameQuery = new AssignmentGroupByNameQuery();
+		nameQuery.setGroupName(cmd.getName());
+		if(assignmentGroupProjection.handle(nameQuery).isPresent()) {
+			throw new IllegalArgumentException("Group [" + cmd.getName() + "] already exists");
+		}
+		
 		AggregateLifecycle.apply(new GroupCreatedEvt(cmd.getGroupId(), cmd.getName()));
 	}
 	

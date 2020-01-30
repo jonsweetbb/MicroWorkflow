@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
 
 @SpringBootApplication
-@EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY)
+@EnableJpaRepositories
 public class AssignmentGroupServiceApplication {
 
 	public static void main(String[] args) {

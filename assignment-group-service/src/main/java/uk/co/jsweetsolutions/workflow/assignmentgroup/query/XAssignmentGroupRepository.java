@@ -11,5 +11,5 @@ public interface XAssignmentGroupRepository extends CrudRepository<AssignmentGro
 	
 	Optional<AssignmentGroupSummary> findById(String id);
 	
-	
+	Optional<AssignmentGroupSummary> findByGroupName(String groupName);
 }
