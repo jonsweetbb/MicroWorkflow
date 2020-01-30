@@ -15,17 +15,19 @@ public class TaskSummary {
 	private String id;
 	
 	private LocalDateTime createdOn;
+	private LocalDateTime lastUpdatedOn;
 	
 	private TaskState state;
 	
 	public TaskSummary() {
 		super();
 	}
-	
-	public TaskSummary(String id, LocalDateTime createdOn, TaskState state) {
+
+	public TaskSummary(String id, LocalDateTime createdOn, LocalDateTime lastUpdatedOn, TaskState state) {
 		super();
 		this.id = id;
 		this.createdOn = createdOn;
+		this.lastUpdatedOn = lastUpdatedOn;
 		this.state = state;
 	}
 

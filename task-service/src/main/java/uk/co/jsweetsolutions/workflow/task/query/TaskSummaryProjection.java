@@ -8,7 +8,8 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import uk.co.jsweetsolutions.workflow.task.event.CreateTaskEvent;
+import uk.co.jsweetsolutions.workflow.task.event.TaskClosedEvent;
+import uk.co.jsweetsolutions.workflow.task.event.TaskCreatedEvent;
 import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummaryByIdQuery;
 import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummariesQuery;
 import uk.co.jsweetsolutions.workflow.task.query.TaskState;
@@ -21,8 +22,19 @@ public class TaskSummaryProjection {
 	private TasksRepository wfTaskRepository;
 	
 	@EventHandler
-	public void on(CreateTaskEvent evt) {
-		wfTaskRepository.save(new TaskSummary(evt.getId(), evt.getCreatedOn(), TaskState.ASSIGNED));
+	public void on(TaskCreatedEvent evt) {
+		// TODO create builder for TaskSummary
+		wfTaskRepository.save(new TaskSummary(evt.getId(), evt.getCreatedOn(), evt.getCreatedOn(), TaskState.ASSIGNED));
+	}
+	
+	@EventHandler
+	public void on(TaskClosedEvent evt) {
+		Optional<TaskSummary> task = wfTaskRepository.findById(evt.getId());
+		task.ifPresent(t -> {
+			t.setState(TaskState.CLOSED);
+			t.setLastUpdatedOn(evt.getClosedOn());
+			wfTaskRepository.save(t);
+		});
 	}
 	
 	@QueryHandler

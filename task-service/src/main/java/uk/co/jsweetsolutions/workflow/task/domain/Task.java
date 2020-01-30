@@ -12,8 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 
 import lombok.Data;
+import uk.co.jsweetsolutions.workflow.task.command.CloseTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
-import uk.co.jsweetsolutions.workflow.task.event.CreateTaskEvent;
+import uk.co.jsweetsolutions.workflow.task.event.TaskClosedEvent;
+import uk.co.jsweetsolutions.workflow.task.event.TaskCreatedEvent;
 
 // TODO separate out as POJO and use inheritance for Aggregate, Command
 @Aggregate
@@ -25,6 +27,7 @@ public class Task {
 	private String id;
 	
 	private LocalDateTime createdOn;
+	private LocalDateTime lastUpdatedOn;
 	
 	private TaskState state;
 	
@@ -40,14 +43,32 @@ public class Task {
 	@CommandHandler
 	public Task(CreateTaskCmd cmd){
 		log.debug("handling {}", cmd);
-		AggregateLifecycle.apply(new CreateTaskEvent(cmd.getId(), cmd.getCreatedOn()));
+		AggregateLifecycle.apply(new TaskCreatedEvent(cmd.getId(), cmd.getCreatedOn()));
 	}
 	
 	@EventSourcingHandler
-	public void on(CreateTaskEvent evt) {
+	public void on(TaskCreatedEvent evt) {
 		log.debug("handling {}", evt);
 		this.id = evt.getId();
 		this.createdOn = evt.getCreatedOn();
+		this.lastUpdatedOn = evt.getCreatedOn();
 		this.state = TaskState.ASSIGNED;
+	}
+	
+	@CommandHandler
+	public void handle(CloseTaskCmd cmd) {
+		switch (this.state) {
+		case ASSIGNED:
+			AggregateLifecycle.apply(new TaskClosedEvent(cmd.getId(), cmd.getClosedOn()));
+			break;
+		default:
+			throw new IllegalStateException("Task [" + this.id + "] cannot be transitioned from " + this.state + " to CLOSED");
+		}
+	}
+	
+	@EventSourcingHandler
+	public void on(TaskClosedEvent evt) {
+		this.state = TaskState.CLOSED;
+		this.lastUpdatedOn = evt.getClosedOn();
 	}
 }

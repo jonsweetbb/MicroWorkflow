@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.netty.util.concurrent.CompleteFuture;
+import uk.co.jsweetsolutions.workflow.task.command.CloseTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
-import uk.co.jsweetsolutions.workflow.task.domain.Task;
-import uk.co.jsweetsolutions.workflow.task.domain.TaskState;
 import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummariesQuery;
 import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummaryByIdQuery;
 import uk.co.jsweetsolutions.workflow.task.query.TaskSummary;
@@ -49,5 +47,12 @@ public class TaskService {
 	@GetMapping(path = "/task/{id}")
 	public CompletableFuture<TaskSummary> findTaskById(@PathVariable(name = "id") String id) {
 		return queryGateway.query(new FetchTaskSummaryByIdQuery(id), ResponseTypes.instanceOf(TaskSummary.class));
+	}
+	
+	@PostMapping(path = "/task/{id}/close")
+	public CompletableFuture<TaskSummary> closeTask(@PathVariable(name = "id") String id){
+		CloseTaskCmd cmd = new CloseTaskCmd(id, LocalDateTime.now());
+		String result = commandGateway.sendAndWait(cmd, 10000, TimeUnit.MILLISECONDS);
+		return result == null ? null : findTaskById(cmd.getId());
 	}
 }
