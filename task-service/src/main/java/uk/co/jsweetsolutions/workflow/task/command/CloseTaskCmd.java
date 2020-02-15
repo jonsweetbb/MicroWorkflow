@@ -12,4 +12,6 @@ public class CloseTaskCmd {
 	private final String id;
 	
 	private final LocalDateTime closedOn;
+	
+	private final String actioningUserId;
 }

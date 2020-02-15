@@ -10,4 +10,20 @@ public class TaskCreatedEvent {
 	private final String id;
 	
 	private final LocalDateTime createdOn;
+	
+	private String assigneeGroupId;
+	private String ownerGroupId;
+	
+	private String taskName;
+
+	public TaskCreatedEvent(String id, LocalDateTime createdOn, String assigneeGroupId, String ownerGroupId,
+			String taskName) {
+		super();
+		this.id = id;
+		this.createdOn = createdOn;
+		this.assigneeGroupId = assigneeGroupId;
+		this.ownerGroupId = ownerGroupId;
+		this.taskName = taskName;
+	}
+	
 }

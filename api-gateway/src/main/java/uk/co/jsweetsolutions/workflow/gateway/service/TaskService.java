@@ -1,5 +1,6 @@
 package uk.co.jsweetsolutions.workflow.gateway.service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -13,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.co.jsweetsolutions.workflow.gateway.messages.CreateTaskRequest;
 import uk.co.jsweetsolutions.workflow.task.command.CloseTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.query.FetchTaskSummariesQuery;
@@ -31,8 +34,9 @@ public class TaskService {
 	private QueryGateway queryGateway;
 	
 	@PostMapping(path = "/task", produces = "application/json")
-	public CompletableFuture<TaskSummary> createTask() {
-		CreateTaskCmd cmd = new CreateTaskCmd(UUID.randomUUID().toString(), LocalDateTime.now());
+	public CompletableFuture<TaskSummary> createTask(@RequestBody CreateTaskRequest req) {
+		CreateTaskCmd cmd = new CreateTaskCmd(UUID.randomUUID().toString(), LocalDateTime.now(), req.getOwnerGroupId(),
+				req.getAssigneeGroupId(), req.getTaskName());
 		String result = commandGateway.sendAndWait(cmd, 10000, TimeUnit.MILLISECONDS);
 		//TODO throw exception if null
 		return result == null ? null : findTaskById(cmd.getId());
@@ -50,9 +54,11 @@ public class TaskService {
 	}
 	
 	@PostMapping(path = "/task/{id}/close")
-	public CompletableFuture<TaskSummary> closeTask(@PathVariable(name = "id") String id){
-		CloseTaskCmd cmd = new CloseTaskCmd(id, LocalDateTime.now());
-		String result = commandGateway.sendAndWait(cmd, 10000, TimeUnit.MILLISECONDS);
+	public CompletableFuture<TaskSummary> closeTask(@PathVariable(name = "id") String id, Principal principal) throws IllegalAccessException{
+		if(principal == null)
+			throw new IllegalAccessException("User must be logged in to perform CLOSE activity");
+		CloseTaskCmd cmd = new CloseTaskCmd(id, LocalDateTime.now(), principal.getName());
+		Object result = commandGateway.sendAndWait(cmd, 10000, TimeUnit.MILLISECONDS);
 		return result == null ? null : findTaskById(cmd.getId());
 	}
 }

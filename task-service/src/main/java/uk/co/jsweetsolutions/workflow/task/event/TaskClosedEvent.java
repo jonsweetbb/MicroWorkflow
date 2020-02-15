@@ -9,4 +9,6 @@ public class TaskClosedEvent {
 	private final String id;
 	
 	private final LocalDateTime closedOn;
+	
+	private final String actioningUserId;
 }

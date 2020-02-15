@@ -57,6 +57,12 @@
 			<version>4.2</version>
 		</dependency>
 		
+		
+		<dependency>
+			<groupId>uk.co.jsweetsolutions.workflow</groupId>
+			<artifactId>assignment-group-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

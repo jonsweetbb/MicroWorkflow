@@ -1,17 +1,25 @@
 package uk.co.jsweetsolutions.workflow.task.domain;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
+import org.axonframework.modelling.command.AggregateRoot;
+import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
 
 import lombok.Data;
+import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupByIdQuery;
+import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummary;
+import uk.co.jsweetsolutions.workflow.assignmentgroup.query.UserSummary;
 import uk.co.jsweetsolutions.workflow.task.command.CloseTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.event.TaskClosedEvent;
@@ -31,19 +39,21 @@ public class Task {
 	
 	private TaskState state;
 	
-	public Task(){}
+	private String ownerGroupId;
+	private String assigneeGroupId;
 	
-	public Task(String id, LocalDateTime createdOn, TaskState state) {
-		super();
-		this.id = id;
-		this.createdOn = createdOn;
-		this.state = state;
-	}
+	private String taskName;
+	
+	public Task(){}
 
 	@CommandHandler
 	public Task(CreateTaskCmd cmd){
 		log.debug("handling {}", cmd);
-		AggregateLifecycle.apply(new TaskCreatedEvent(cmd.getId(), cmd.getCreatedOn()));
+		AggregateLifecycle.apply(new TaskCreatedEvent(cmd.getId()
+													, cmd.getCreatedOn()
+													, cmd.getAssigneeGroupId()
+													, cmd.getOwnerGroupId()
+													, cmd.getTaskName()));
 	}
 	
 	@EventSourcingHandler
@@ -53,17 +63,43 @@ public class Task {
 		this.createdOn = evt.getCreatedOn();
 		this.lastUpdatedOn = evt.getCreatedOn();
 		this.state = TaskState.ASSIGNED;
+		this.ownerGroupId = evt.getOwnerGroupId();
+		this.assigneeGroupId = evt.getAssigneeGroupId();
+		this.taskName = evt.getTaskName();
 	}
 	
 	@CommandHandler
-	public void handle(CloseTaskCmd cmd) {
+	public Task handle(CloseTaskCmd cmd, QueryGateway queryGateway) {
 		switch (this.state) {
 		case ASSIGNED:
-			AggregateLifecycle.apply(new TaskClosedEvent(cmd.getId(), cmd.getClosedOn()));
+			AssignmentGroupByIdQuery ownerQuery = new AssignmentGroupByIdQuery();
+			ownerQuery.setGroupId(ownerGroupId);
+			List<AssignmentGroupByIdQuery> queries = Collections.singletonList(ownerQuery);
+			if(this.ownerGroupId != this.assigneeGroupId) {
+				AssignmentGroupByIdQuery assigneeQuery = new AssignmentGroupByIdQuery();
+				assigneeQuery.setGroupId(assigneeGroupId);
+				queries.add(assigneeQuery);
+			}
+			
+			List<AssignmentGroupSummary> assignmentGroups = queries.parallelStream()
+					.map(query -> queryGateway.query(query, ResponseTypes.instanceOf(AssignmentGroupSummary.class)).join())
+					.collect(Collectors.toList());
+			
+			boolean userHasPermission = assignmentGroups.stream()
+					.flatMap(agSummary -> agSummary.getMembers().stream())
+					.anyMatch(member -> member.getId().equals(cmd.getActioningUserId()));
+			
+			if(!userHasPermission) {
+				String message = "User [" + cmd.getActioningUserId() + "] is not in the right groups to close the task [" + this.id + "]: " 
+						+ assignmentGroups.stream().map(ag -> ag.getGroupName()).collect(Collectors.joining("] , [", "[", "]"));
+				throw new IllegalStateException(message);
+			}
+			AggregateLifecycle.apply(new TaskClosedEvent(cmd.getId(), cmd.getClosedOn(), cmd.getActioningUserId()));
 			break;
 		default:
 			throw new IllegalStateException("Task [" + this.id + "] cannot be transitioned from " + this.state + " to CLOSED");
 		}
+		return this;
 	}
 	
 	@EventSourcingHandler

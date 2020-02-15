@@ -1,9 +1,15 @@
 package uk.co.jsweetsolutions.workflow.gateway.service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.messaging.responsetypes.ResponseType;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +18,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.co.jsweetsolutions.workflow.assignmentgroup.command.AddMembersCmd;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.command.CreateGroupCmd;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupByIdQuery;
+import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummariesQuery;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummary;
 import uk.co.jsweetsolutions.workflow.gateway.model.AssignmentGroup;
+import uk.co.jsweetsolutions.workflow.gateway.model.WorkflowUser;
 
 @RestController
 public class AssginmentGroupService {
@@ -34,11 +43,24 @@ public class AssginmentGroupService {
 		return result == null ? null : getAssignmentGroup(groupId);
 	}
 	
+	@PostMapping(path = "/group/{id}")
+	public CompletableFuture<AssignmentGroupSummary> addUsersToGroup(@RequestBody String[] users, @PathVariable(name = "id") String id){
+		AddMembersCmd cmd = new AddMembersCmd(id, Arrays.asList(users));
+		Object result = commandGateway.sendAndWait(cmd, 10000, TimeUnit.MILLISECONDS);
+		return result == null ? null : getAssignmentGroup(id);
+	}
+	
 	@GetMapping(path = "/group/{id}")
 	public CompletableFuture<AssignmentGroupSummary> getAssignmentGroup(@PathVariable(name = "id") String id){
 		AssignmentGroupByIdQuery qry = new AssignmentGroupByIdQuery();
 		qry.setGroupId(id);
-		return queryGateway.query(qry, AssignmentGroupSummary.class);
+		return queryGateway.query(qry, ResponseTypes.instanceOf(AssignmentGroupSummary.class));
+	}
+	
+	@GetMapping(path = "/group")
+	public CompletableFuture<List<AssignmentGroupSummary>> getAssignmentGroups(){
+		AssignmentGroupSummariesQuery qry = new AssignmentGroupSummariesQuery(0, 0);
+		return queryGateway.query(qry, ResponseTypes.multipleInstancesOf(AssignmentGroupSummary.class));
 	}
 	
 }
