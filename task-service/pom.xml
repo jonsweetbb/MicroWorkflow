@@ -56,6 +56,12 @@
 			<artifactId>axon-spring-boot-starter</artifactId>
 			<version>4.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.axonframework</groupId>
+			<artifactId>axon-test</artifactId>
+			<version>4.2</version>
+			<scope>test</scope>
+		</dependency>
 		
 		
 		<dependency>

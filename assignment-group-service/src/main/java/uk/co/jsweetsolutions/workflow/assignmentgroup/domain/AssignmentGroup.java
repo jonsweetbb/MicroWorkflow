@@ -64,7 +64,6 @@ public class AssignmentGroup {
 		
 		if(existingMembers.isEmpty()) {
 			log.debug("Existing members not found in list");
-			members.addAll(cmd.getUserIds());
 			AggregateLifecycle.apply(new MemberAddedEvt(cmd.getGroupId(), cmd.getUserIds()));
 		}else {
 			log.warn("Existing members found in list!");

@@ -1,6 +1,7 @@
 package uk.co.jsweetsolutions.workflow.task.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +75,7 @@ public class Task {
 		case ASSIGNED:
 			AssignmentGroupByIdQuery ownerQuery = new AssignmentGroupByIdQuery();
 			ownerQuery.setGroupId(ownerGroupId);
-			List<AssignmentGroupByIdQuery> queries = Collections.singletonList(ownerQuery);
+			List<AssignmentGroupByIdQuery> queries = new ArrayList<>(Collections.singletonList(ownerQuery));
 			if(this.ownerGroupId != this.assigneeGroupId) {
 				AssignmentGroupByIdQuery assigneeQuery = new AssignmentGroupByIdQuery();
 				assigneeQuery.setGroupId(assigneeGroupId);
