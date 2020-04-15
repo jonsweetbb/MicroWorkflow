@@ -27,7 +27,6 @@ import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupByNam
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummary;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummaryProjection;
 
-@SpringBootTest(classes = AssignmentGroupServiceApplication.class)
 public class CommandTests {
 	private FixtureConfiguration<AssignmentGroup> fixture;
 	

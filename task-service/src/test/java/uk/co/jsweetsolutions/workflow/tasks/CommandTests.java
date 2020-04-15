@@ -1,26 +1,24 @@
 package uk.co.jsweetsolutions.workflow.tasks;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import org.axonframework.messaging.responsetypes.ResponseType;
-import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
 
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupByIdQuery;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummary;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.UserSummary;
-import uk.co.jsweetsolutions.workflow.task.TaskServiceApplication;
 import uk.co.jsweetsolutions.workflow.task.command.CloseTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.domain.Task;
@@ -28,7 +26,6 @@ import uk.co.jsweetsolutions.workflow.task.domain.TaskState;
 import uk.co.jsweetsolutions.workflow.task.event.TaskClosedEvent;
 import uk.co.jsweetsolutions.workflow.task.event.TaskCreatedEvent;
 
-@SpringBootTest(classes = TaskServiceApplication.class)
 public class CommandTests {
 
 	private FixtureConfiguration<Task> fixture;
