@@ -8,7 +8,8 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 import { MatMenuModule } from '@angular/material/menu'
 import { MatIconModule } from '@angular/material/icon'
 import { MatListModule } from '@angular/material/list'
-import { AppRoutingModuleModule } from './app-routing-module/app-routing-module.module';
+import { MatTableModule } from '@angular/material/table'
+import { AppRoutingModuleRoutingModule } from './app-routing-module/app-routing-module-routing.module';
 
 @NgModule({
   declarations: [
@@ -18,11 +19,12 @@ import { AppRoutingModuleModule } from './app-routing-module/app-routing-module.
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    AppRoutingModuleModule,
+    AppRoutingModuleRoutingModule,
     MatToolbarModule,
     MatMenuModule,
     MatIconModule,
-    MatListModule
+    MatListModule,
+    MatTableModule
   ],
   providers: [],
   bootstrap: [AppComponent]

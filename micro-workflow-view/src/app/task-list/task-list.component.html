@@ -1,8 +1,9 @@
 <p>task-list works!</p>
-<mat-list>
-    <mat-list-item>task-list works!</mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item>task-list works!</mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item>task-list works!</mat-list-item>
-  </mat-list>
+<table mat-table [dataSource]="tasks">
+  <ng-container matColumnDef="taskId">
+    <th mat-header-cell *matHeaderCellDef> ID </th>
+    <td mat-cell *matCellDef="let task"> {{task.id}} </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
