@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { TaskServiceService, TaskSummary } from '../task-service/task-service.service';
+import { Observable } from 'rxjs';
 
 export interface Task {
   id: string;
@@ -21,10 +23,12 @@ const TASKS: Task[] =[
 export class TaskListComponent implements OnInit {
   displayedColumns: string[] = ['taskId', 'createdOn', 'lastUpdatedOn', 'state'];
   tasks = TASKS;
+  task$: Observable<TaskSummary[]>;
 
-  constructor() { }
+  constructor(private taskService: TaskServiceService) { }
 
   ngOnInit(): void {
+    this.task$ = this.taskService.getAll();
   }
 
 }

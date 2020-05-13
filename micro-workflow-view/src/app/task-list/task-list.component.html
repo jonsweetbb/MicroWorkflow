@@ -1,5 +1,5 @@
 <div fxFlexAlign="stretch">
-  <mat-table [dataSource]="tasks">
+  <mat-table [dataSource]="task$ | async">
 
     <ng-container matColumnDef="taskId">
       <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
