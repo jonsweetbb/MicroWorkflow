@@ -21,11 +21,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-core</artifactId>
 		</dependency>
 
 		<dependency>
@@ -51,11 +55,6 @@
 		</dependency>
 		
 		<dependency>
-		  <groupId>org.springframework.boot</groupId>
-		  <artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
@@ -78,6 +77,14 @@
 			<groupId>uk.co.jsweetsolutions.workflow</groupId>
 			<artifactId>assignment-group-service</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>
+						spring-boot-starter-actuator
+					</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -90,7 +97,7 @@
 		</plugins>
 	</build>
 
-	<repositories>
+	<!-- repositories>
        <repository>
          <id>central</id>
          <url>https://repo1.maven.org/maven2</url>
@@ -107,5 +114,5 @@
            <enabled>true</enabled>
          </releases>
        </pluginRepository>
-     </pluginRepositories>
+     </pluginRepositories-->
 </project>

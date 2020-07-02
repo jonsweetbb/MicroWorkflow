@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.server.WebSession;
 import uk.co.jsweetsolutions.workflow.gateway.messages.CreateTaskRequest;
 import uk.co.jsweetsolutions.workflow.task.command.CloseTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
@@ -43,9 +45,14 @@ public class TaskService {
 	}
 	
 	@GetMapping(path = "/task", produces = "application/json")
-	public List<TaskSummary> findAllTasks(){
+	public List<TaskSummary> findAllTasks(WebSession webSession){
 		//TODO implement pagination
-		return queryGateway.query(new FetchTaskSummariesQuery(0, 10), ResponseTypes.multipleInstancesOf(TaskSummary.class)).join();
+		List<TaskSummary> result = queryGateway.query(new FetchTaskSummariesQuery(0, 10), ResponseTypes.multipleInstancesOf(TaskSummary.class)).join();
+		List<String> taskIds = result.stream()
+				.map(TaskSummary::getId)
+				.collect(Collectors.toList());
+		webSession.getAttributes().put(SessionConstants.LIVE_TASK_IDS, taskIds);
+		return result;
 	}
 	
 	@GetMapping(path = "/task/{id}")

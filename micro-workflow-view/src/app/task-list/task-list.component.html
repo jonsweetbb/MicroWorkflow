@@ -1,5 +1,5 @@
 <div fxFlexAlign="stretch">
-  <mat-table [dataSource]="task$ | async">
+  <mat-table [dataSource]="tasks">
 
     <ng-container matColumnDef="taskId">
       <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
@@ -8,12 +8,12 @@
 
     <ng-container matColumnDef="createdOn">
       <mat-header-cell *matHeaderCellDef> Created </mat-header-cell>
-      <mat-cell *matCellDef="let task"> {{ task.createdOn | date }} </mat-cell>
+      <mat-cell *matCellDef="let task"> {{ task.createdOn }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="lastUpdatedOn">
       <mat-header-cell *matHeaderCellDef> Updated </mat-header-cell>
-      <mat-cell *matCellDef="let task"> {{ task.lastUpdatedOn | date }} </mat-cell>
+      <mat-cell *matCellDef="let task"> {{ task.lastUpdatedOn }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="state">

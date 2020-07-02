@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface TaskSummary {
@@ -11,25 +11,14 @@ export interface TaskSummary {
 
 const httpOptions = {
   headers: new HttpHeaders({
-    'Content-Type':  'application/json',
-    // 'Connection': 'Keep-Alive',
-    'Authorization': 'Basic ' + btoa('12:password')
+    'Content-Type':  'application/json'
   })
-  
-  // , observe: 'body'
-  // , params: new HttpParams()
-  // , reportProgress: false
-  // , responseType: 'json'
-  // , withCredentials: true
 };
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskServiceService {
-
-  // baseUrl: string = 'http://1:password@localhost:8080'
-  baseUrl: string = 'http://localhost:8080'
 
   constructor(private http: HttpClient) { 
   }
@@ -39,4 +28,35 @@ export class TaskServiceService {
     , httpOptions
     );
   }
+
+  subscribeToUpdates(page?: number, size?: number): Observable<TaskSummary> {
+    return new Observable<TaskSummary>((observer) => {
+      let url = '/stream/tasks/updates';
+      let eventSource = new EventSource(url);
+      eventSource.onmessage = (event) => {
+        console.debug('Received event: ', event);
+        let json = JSON.parse(event.data);
+        observer.next({
+          id: json['id'], 
+          createdOn: json['createdOn'], 
+          lastUpdatedOn: json['lastUpdatedOn'], 
+          state: json['state']
+        });
+      };
+      eventSource.onerror = (error) => {
+        // readyState === 0 (closed) means the remote source closed the connection,
+        // so we can safely treat it as a normal situation. Another way 
+        // of detecting the end of the stream is to insert a special element
+        // in the stream of events, which the client can identify as the last one.
+        if(eventSource.readyState === 0) {
+          console.log('The stream has been closed by the server.');
+          eventSource.close();
+          observer.complete();
+        } else {
+          observer.error('EventSource error: ' + error);
+        }
+      }
+    });
+  }
+
 }

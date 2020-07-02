@@ -1,9 +1,13 @@
 package uk.co.jsweetsolutions.workflow.gateway.messages;
 
 public class CreateTaskRequest {
-	private final String taskName;
-	private final String ownerGroupId;
-	private final String assigneeGroupId;
+	private String taskName = null;
+	private String ownerGroupId = null;
+	private String assigneeGroupId = null;
+
+	public CreateTaskRequest(){
+
+	}
 
 	public CreateTaskRequest(String taskName, String ownerGroupId, String assigneeGroupId) {
 		super();
@@ -23,5 +27,16 @@ public class CreateTaskRequest {
 	public String getTaskName() {
 		return taskName;
 	}
-	
+
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
+
+	public void setOwnerGroupId(String ownerGroupId) {
+		this.ownerGroupId = ownerGroupId;
+	}
+
+	public void setAssigneeGroupId(String assigneeGroupId) {
+		this.assigneeGroupId = assigneeGroupId;
+	}
 }

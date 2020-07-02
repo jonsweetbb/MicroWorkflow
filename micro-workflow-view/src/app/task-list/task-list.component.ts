@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { TaskServiceService, TaskSummary } from '../task-service/task-service.service';
-import { Observable } from 'rxjs';
+import { Observable, of as observableOf } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 export interface Task {
   id: string;
@@ -18,17 +19,49 @@ const TASKS: Task[] =[
 @Component({
   selector: 'msfw-task-list',
   templateUrl: './task-list.component.html',
-  styleUrls: ['./task-list.component.css']
+  styleUrls: ['./task-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class TaskListComponent implements OnInit {
   displayedColumns: string[] = ['taskId', 'createdOn', 'lastUpdatedOn', 'state'];
-  tasks = TASKS;
-  task$: Observable<TaskSummary[]>;
+  tasks: TaskSummary[] = [];
+  initialTask$: Observable<TaskSummary[]>;
+  taskUpdate$: Observable<TaskSummary>;
 
-  constructor(private taskService: TaskServiceService) { }
+  constructor(private taskService: TaskServiceService
+    , private cdr: ChangeDetectorRef
+    ) { }
 
   ngOnInit(): void {
-    this.task$ = this.taskService.getAll();
+    this.initialTask$ = this.taskService.getAll();
+    this.initialTask$.pipe(
+      map(data => {
+        console.log('Loading finished');
+        this.subscribeToUpdates();
+        return data;
+      }),
+      catchError((err) => {
+        console.log('Error: ' + err);
+        return observableOf([]);
+      })
+    ).subscribe(data => {
+      this.tasks = data
+      this.cdr.detectChanges();
+    });
   }
 
+  subscribeToUpdates(): void {
+    this.taskUpdate$ = this.taskService.subscribeToUpdates();
+    console.log("Subcribing to: updates");
+    this.taskUpdate$
+    .subscribe(
+      updatedTask => {
+      console.log("Update recieved for: " + updatedTask );
+      let index = this.tasks.findIndex(item => item.id == updatedTask.id);
+      this.tasks[index] = updatedTask;
+      this.tasks = this.tasks.slice();
+      this.cdr.detectChanges();
+    });
+ 
+  }
 }
