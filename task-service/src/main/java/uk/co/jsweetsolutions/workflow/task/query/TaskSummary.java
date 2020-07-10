@@ -5,9 +5,11 @@ import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @Entity
 public class TaskSummary {
 	

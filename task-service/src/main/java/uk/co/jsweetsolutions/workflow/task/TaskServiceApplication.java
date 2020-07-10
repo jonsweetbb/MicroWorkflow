@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import uk.co.jsweetsolutions.workflow.task.query.TasksRepository;
 
 @SpringBootApplication
-@EnableJpaRepositories("uk.co.jsweetsolutions.workflow.task.query")
 public class TaskServiceApplication {
 
 	public static void main(String[] args) {
