@@ -31,14 +31,14 @@
 #        alias: dynamodblocal
     stage: integration-test
     script:
+      - cd assignment-group-service
       - mvn $MAVEN_CLI_OPTS install -P integration-test -Dspring.profiles.active=ci
       - mkdir target/dependency
       - (cd target/dependency; jar -xf ../*.jar)
     artifacts:
       paths:
-        - target/*.jar
-        - target/dependency
-        - target/surefire-reports/*
+        - assignment-group-service/target/*.jar
+        - assignment-group-service/target/failsafe-reports/*
 
   build-image:
     image: docker:latest
