@@ -1,58 +1,70 @@
 package uk.co.jsweetsolutions.workflow.gateway.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.FluxExchangeResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummary;
+import uk.co.jsweetsolutions.workflow.gateway.config.BaseWebSecurityConfiguration;
+import uk.co.jsweetsolutions.workflow.gateway.model.AssignmentGroup;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(SpringExtension.class)
+@WebFluxTest({AssignmentGroupService.class})
+@Import({BaseWebSecurityConfiguration.class, AssignmentGroupServiceConfig.class})
 public class AssignmentGroupServiceTests {
 
 	@Autowired
-	private MockMvc mockMvc;
-	
+	private WebTestClient webTestClient;
+
 	@Test
 	public void shouldReturnUnauthenticated() throws Exception{
-		this.mockMvc
-			.perform(get("/group"))
-			.andExpect(status().isUnauthorized());
+		webTestClient.get()
+				.uri("/group")
+				.exchange()
+				.expectStatus().isUnauthorized();
 	}
 	
 	@Test
+	@WithMockUser(username = "1")
 	public void shouldReturnNewGroup() throws Exception {
-		MvcResult result = this.mockMvc
-			.perform(get("/group").with(httpBasic("1", "password")))
-			.andExpect(status().is2xxSuccessful())
-			.andReturn();
-		
-		AssignmentGroupSummary agSummary = (AssignmentGroupSummary) result.getAsyncResult();
-		
+		FluxExchangeResult<AssignmentGroupSummary> result =
+				webTestClient.get()
+				.uri("/group")
+				.exchange()
+				.expectStatus().isOk()
+				.returnResult(AssignmentGroupSummary.class)
+				;
+
+		AssignmentGroupSummary agSummary = (AssignmentGroupSummary) result.getResponseBody().blockFirst();
+
 		assertValues(agSummary);
 	}
-	
+
 	@Test
+	@WithMockUser(username = "1")
 	public void testCreateGroup() throws Exception {
-		MvcResult result = this.mockMvc
-				.perform(post("/group")
+		AssignmentGroup assignmentGroupArg = new AssignmentGroup();
+		assignmentGroupArg.setGroupName("TestGroup");
+
+		FluxExchangeResult<AssignmentGroupSummary> result = webTestClient.post()
+				.uri("/group")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"groupName\":\"TestGroup\"}")
-				.with(httpBasic("1", "password")))
-				.andReturn();
-		
-		AssignmentGroupSummary agSummary = (AssignmentGroupSummary) result.getAsyncResult();
-		
+				.body(Mono.just(assignmentGroupArg), AssignmentGroup.class)
+				.exchange()
+				.expectStatus().isCreated()
+				.returnResult(AssignmentGroupSummary.class);
+
+		AssignmentGroupSummary agSummary = (AssignmentGroupSummary) result.getResponseBody().blockFirst();
+
 		assertValues(agSummary);
 	}
 	
