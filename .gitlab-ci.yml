@@ -1,0 +1,3 @@
+assignment-group-service:
+  trigger:
+    include: assignment-group-service/.gitlab-ci.yml
