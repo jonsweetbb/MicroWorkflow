@@ -21,6 +21,7 @@
     image: maven:3-jdk-8
     stage: unit-test
     script:
+      - cd assignment-group-service
       - mvn $MAVEN_CLI_OPTS clean test -P unit-test
 
   maven-integration-test:
