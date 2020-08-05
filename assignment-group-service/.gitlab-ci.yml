@@ -43,6 +43,7 @@
         junit: assignment-group-service/target/failsafe-reports/TEST-*.xml
       paths:
         - assignment-group-service/target/*.jar
+        - assignment-group-service/target/dependency
 
   build-image:
     image: docker:latest
