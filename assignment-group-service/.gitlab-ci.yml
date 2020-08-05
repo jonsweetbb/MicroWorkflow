@@ -23,6 +23,9 @@
     script:
       - cd assignment-group-service
       - mvn $MAVEN_CLI_OPTS clean test -P unit-test
+    artifacts:
+      reports:
+        junit: assignment-group-service/target/surefire-reports/TEST-*.xml
 
   maven-integration-test:
     image: maven:3-jdk-8
@@ -36,6 +39,8 @@
       - mkdir target/dependency
       - (cd target/dependency; jar -xf ../*.jar)
     artifacts:
+      reports:
+        junit: assignment-group-service/target/failsafe-reports/TEST-*.xml
       paths:
         - assignment-group-service/target/*.jar
         - assignment-group-service/target/failsafe-reports/*
