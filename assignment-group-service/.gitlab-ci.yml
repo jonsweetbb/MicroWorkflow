@@ -43,7 +43,6 @@
         junit: assignment-group-service/target/failsafe-reports/TEST-*.xml
       paths:
         - assignment-group-service/target/*.jar
-        - assignment-group-service/target/failsafe-reports/*
 
   build-image:
     image: docker:latest
@@ -54,6 +53,7 @@
       - apk add --no-cache curl jq python3 py-pip
       - pip install awscli
       - $(aws ecr get-login --no-include-email --region eu-west-2)
+      - cd assignment-group-service
       - docker build -t $REPOSITORY_URL:latest .
       - docker tag $REPOSITORY_URL:latest $REPOSITORY_URL:$IMAGE_TAG
       - docker push $REPOSITORY_URL:latest
