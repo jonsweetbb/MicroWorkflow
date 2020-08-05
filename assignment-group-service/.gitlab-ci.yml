@@ -67,5 +67,6 @@
     script:
       - pip install awscli
       - echo $REPOSITORY_URL:$IMAGE_TAG
+      - cd assignment-group-service
       - aws ecs register-task-definition --region eu-west-2 --family mwf-assignment-group-service --cli-input-json file://aws/ecs-task-definition.json
       - aws ecs update-service --region eu-west-2 --cluster mwf-ci --service assignment-group-service  --task-definition assignment-group-service
