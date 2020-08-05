@@ -1,8 +1,8 @@
 {
-  "family": "MWF",
+  "family": "mwf",
   "containerDefinitions": [
     {
-      "name": "AssignmentGroupService",
+      "name": "assignment-group-service",
       "image": "593646001153.dkr.ecr.eu-west-2.amazonaws.com/mwf:latest",
       "cpu": 0,
       "memory": 256,
