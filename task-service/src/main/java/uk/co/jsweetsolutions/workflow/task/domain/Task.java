@@ -1,30 +1,27 @@
 package uk.co.jsweetsolutions.workflow.task.domain;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import lombok.Data;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
-import org.axonframework.modelling.command.AggregateRoot;
 import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.Data;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupByIdQuery;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.query.AssignmentGroupSummary;
-import uk.co.jsweetsolutions.workflow.assignmentgroup.query.UserSummary;
 import uk.co.jsweetsolutions.workflow.task.command.CloseTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.command.CreateTaskCmd;
 import uk.co.jsweetsolutions.workflow.task.event.TaskClosedEvent;
 import uk.co.jsweetsolutions.workflow.task.event.TaskCreatedEvent;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO separate out as POJO and use inheritance for Aggregate, Command
 @Aggregate

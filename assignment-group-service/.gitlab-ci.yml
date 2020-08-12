@@ -1,0 +1,72 @@
+
+  before_script:
+  - IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
+
+  cache:
+    paths:
+      - maven.repository/
+
+  variables:
+    MAVEN_OPTS: "-Djava.awt.headless=true -Dmaven.repo.local=maven.repository/"
+    MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+    REPOSITORY_URL: 593646001153.dkr.ecr.eu-west-2.amazonaws.com/mwf
+
+  stages:
+    - unit-test
+    - integration-test
+    - package
+    - deploy
+
+  maven-unit-test:
+    image: maven:3-jdk-8
+    stage: unit-test
+    script:
+      - cd assignment-group-service
+      - mvn $MAVEN_CLI_OPTS clean test -P unit-test
+    artifacts:
+      reports:
+        junit: assignment-group-service/target/surefire-reports/TEST-*.xml
+
+  maven-integration-test:
+    image: maven:3-jdk-8
+#    services:
+#      - name: amazon/dynamodb-local
+#        alias: dynamodblocal
+    stage: integration-test
+    script:
+      - cd assignment-group-service
+      - mvn $MAVEN_CLI_OPTS install -P integration-test -Dspring.profiles.active=ci
+      - mkdir target/dependency
+      - (cd target/dependency; jar -xf ../*exec.jar)
+    artifacts:
+      reports:
+        junit: assignment-group-service/target/failsafe-reports/TEST-*.xml
+      paths:
+        - assignment-group-service/target/*.jar
+        - assignment-group-service/target/dependency
+
+  build-image:
+    image: docker:latest
+    stage: package
+    services:
+      - name: docker:dind
+    script:
+      - apk add --no-cache curl jq python3 py-pip
+      - pip install awscli
+      - $(aws ecr get-login --no-include-email --region eu-west-2)
+      - cd assignment-group-service
+      - docker build -t $REPOSITORY_URL:latest .
+      - docker tag $REPOSITORY_URL:latest $REPOSITORY_URL:$IMAGE_TAG
+      - docker push $REPOSITORY_URL:latest
+      - docker push $REPOSITORY_URL:$IMAGE_TAG
+
+
+  deploy:
+    image: python:latest
+    stage: deploy
+    script:
+      - pip install awscli
+      - echo $REPOSITORY_URL:$IMAGE_TAG
+      - cd assignment-group-service
+      - aws ecs register-task-definition --region eu-west-2 --family mwf --cli-input-json file://aws/ecs-task-definition.json
+      - aws ecs update-service --region eu-west-2 --cluster mwf-ci --service assignment-group-service  --task-definition mwf

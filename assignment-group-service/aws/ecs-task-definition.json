@@ -1,0 +1,26 @@
+{
+  "family": "mwf",
+  "containerDefinitions": [
+    {
+      "name": "assignment-group-service",
+      "image": "593646001153.dkr.ecr.eu-west-2.amazonaws.com/mwf:latest",
+      "cpu": 0,
+      "memory": 256,
+      "environment": [
+        {
+          "name": "spring.profiles.active",
+          "value": "dev"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/MWF",
+          "awslogs-region": "eu-west-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

@@ -12,11 +12,8 @@ import org.axonframework.messaging.responsetypes.ResponseType;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import uk.co.jsweetsolutions.workflow.assignmentgroup.command.AddMembersCmd;
 import uk.co.jsweetsolutions.workflow.assignmentgroup.command.CreateGroupCmd;
@@ -27,7 +24,7 @@ import uk.co.jsweetsolutions.workflow.gateway.model.AssignmentGroup;
 import uk.co.jsweetsolutions.workflow.gateway.model.WorkflowUser;
 
 @RestController
-public class AssginmentGroupService {
+public class AssignmentGroupService {
 
 	@Autowired
 	private CommandGateway commandGateway;
@@ -36,6 +33,7 @@ public class AssginmentGroupService {
 	private QueryGateway queryGateway;
 	
 	@PostMapping(path = "/group")
+	@ResponseStatus(HttpStatus.CREATED)
 	public CompletableFuture<AssignmentGroupSummary> createGroup(@RequestBody AssignmentGroup group){
 		String groupId = UUID.randomUUID().toString();
 		CreateGroupCmd cmd = new CreateGroupCmd(groupId, group.getGroupName());
