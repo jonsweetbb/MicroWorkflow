@@ -13,7 +13,6 @@
 
   stages:
     - unit-test
-    - integration-test
     - package
     - deploy
 
@@ -21,29 +20,13 @@
     image: maven:3-jdk-8
     stage: unit-test
     script:
-      - cd assignment-group-service
-      - mvn $MAVEN_CLI_OPTS clean test -P unit-test
-    artifacts:
-      reports:
-        junit: assignment-group-service/target/surefire-reports/TEST-*.xml
-
-  maven-integration-test:
-    image: maven:3-jdk-8
-#    services:
-#      - name: amazon/dynamodb-local
-#        alias: dynamodblocal
-    stage: integration-test
-    script:
-      - cd assignment-group-service
-      - mvn $MAVEN_CLI_OPTS install -P integration-test -Dspring.profiles.active=ci
+      - cd api-gateway
+      - mvn $MAVEN_CLI_OPTS clean package -P unit-test
       - mkdir target/dependency
       - (cd target/dependency; jar -xf ../*exec.jar)
     artifacts:
       reports:
-        junit: assignment-group-service/target/failsafe-reports/TEST-*.xml
-      paths:
-        - assignment-group-service/target/*.jar
-        - assignment-group-service/target/dependency
+        junit: api-gateway/target/surefire-reports/TEST-*.xml
 
   build-image:
     image: docker:latest
@@ -54,7 +37,7 @@
       - apk add --no-cache curl jq python3 py-pip
       - pip install awscli
       - $(aws ecr get-login --no-include-email --region eu-west-2)
-      - cd assignment-group-service
+      - cd api-gateway
       - docker build -t $REPOSITORY_URL:latest .
       - docker tag $REPOSITORY_URL:latest $REPOSITORY_URL:$IMAGE_TAG
       - docker push $REPOSITORY_URL:latest
@@ -67,6 +50,6 @@
     script:
       - pip install awscli
       - echo $REPOSITORY_URL:$IMAGE_TAG
-      - cd assignment-group-service
+      - cd api-gateway
       - aws ecs register-task-definition --region eu-west-2 --family mwf --cli-input-json file://aws/ecs-task-definition.json
-      - aws ecs update-service --region eu-west-2 --cluster mwf-ci --service assignment-group-service  --task-definition mwf-assignment-group-service
+      - aws ecs update-service --region eu-west-2 --cluster mwf-ci --service api-gateway  --task-definition mwf-api-gateway
