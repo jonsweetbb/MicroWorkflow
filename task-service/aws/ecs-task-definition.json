@@ -2,8 +2,8 @@
   "family": "mwf",
   "containerDefinitions": [
     {
-      "name": "api-gateway",
-      "image": "593646001153.dkr.ecr.eu-west-2.amazonaws.com/mwf-api-gateway:latest",
+      "name": "task-service",
+      "image": "593646001153.dkr.ecr.eu-west-2.amazonaws.com/mwf-task-service:latest",
       "cpu": 0,
       "memory": 256,
       "environment": [

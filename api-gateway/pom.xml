@@ -106,22 +106,20 @@
 		</plugins>
 	</build>
 
-	<!-- repositories>
-       <repository>
-         <id>central</id>
-         <url>https://repo1.maven.org/maven2</url>
-         <releases>
-           <enabled>true</enabled>
-         </releases>
-       </repository>
-     </repositories>
-     <pluginRepositories>
-       <pluginRepository>
-         <id>central</id>
-         <url>https://repo1.maven.org/maven2</url>
-         <releases>
-           <enabled>true</enabled>
-         </releases>
-       </pluginRepository>
-     </pluginRepositories-->
+	<repositories>
+		<repository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/projects/20248605/packages/maven</url>
+		</repository>
+	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/projects/20248605/packages/maven</url>
+		</repository>
+		<snapshotRepository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/projects/20248605/packages/maven</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

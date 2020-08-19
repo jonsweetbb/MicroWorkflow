@@ -1,4 +1,5 @@
 assignment-group-service:
   trigger:
     include: assignment-group-service/.gitlab-ci.yml
+    include: task-service/.gitlab-ci.yml
     include: api-gateway/.gitlab-ci.yml
